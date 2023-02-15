@@ -61,27 +61,34 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @app.delete("/items/{user_id}/",response_model=schemas.User)
 def delete_user(user_id:int,db:Session=Depends(get_db)):
     user_query = db.query(models.User).filter(models.User.id == user_id)
+    user_query.column_descriptions
     user = user_query.first()
+    print("user data is ",user)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'User not Exist')
     user_query.delete(synchronize_session=False)
     db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_200_OK)
 
-@app.patch("items/{user_id}/",response_model=schemas.User)
-def updateUser(user_id:int,user:schemas.UserCreate ,db:Session=Depends(get_db)):
+@app.patch("/items/{user_id}/",response_model=schemas.UserUpdate)
+def updateUser(user_id:int,user:schemas.UserUpdate ,db:Session=Depends(get_db)):
+    print("user id",type(user_id))
+    print("request data",user)
     user_query = db.query(models.User).filter(models.User.id == user_id)
-    user = user_query.first()
+    print("dataquery is ",type(user_query))
+    user_data = user_query.first()
 
-    if not user:
+    print("USER DATA",type(user_data))
+    if not user_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'No note with this id: {user_id} found')
     update_data = user.dict(exclude_unset=True)
-    user_query.filter(models.User.id == user_id).update(update_data,
-                                                       synchronize_session=False)
-    db.commit()
-    db.refresh(user)
-    return {"status": "success", "note": user}
+    print("update data is ",update_data)
+    # user_query.update(update_data, synchronize_session=False)
+    # print("Query is execue")
+    # db.commit()
+    # db.refresh(user_data)
+    return {"status": "success"}
 
     
 

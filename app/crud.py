@@ -12,7 +12,10 @@ def get_user_by_email(db: Session, email: str):
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).offset(skip).limit(limit).all()
+    query =  db.query(models.User).offset(skip).limit(limit).all()   #return List
+    print("query is ",type(query))
+    print("id is ",query[0].items[0].title)
+    return query
 
 
 def create_user(db: Session, user: schemas.UserCreate):

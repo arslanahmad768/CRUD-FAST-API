@@ -3,6 +3,7 @@ from typing import List, Union
 from pydantic import BaseModel
 
 
+# common properties
 class ItemBase(BaseModel):
     title: str
     description: Union[str, None] = None
@@ -20,6 +21,7 @@ class Item(ItemBase):
         orm_mode = True
 
 
+#define commmon properties
 class UserBase(BaseModel):
     email: str
 
@@ -27,6 +29,9 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+class UserUpdate(UserBase):
+    is_active: bool
+    items: List[Item]=[]
 
 class User(UserBase):
     id: int
