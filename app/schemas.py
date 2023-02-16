@@ -31,7 +31,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     is_active: bool
-    items: List[Item]=[]
+    items: dict=""
 
 class User(UserBase):
     id: int

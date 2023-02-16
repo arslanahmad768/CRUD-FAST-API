@@ -70,25 +70,27 @@ def delete_user(user_id:int,db:Session=Depends(get_db)):
     db.commit()
     return Response(status_code=status.HTTP_200_OK)
 
-@app.patch("/items/{user_id}/",response_model=schemas.UserUpdate)
+@app.patch("/items/{user_id}/",response_model=schemas.User)
 def updateUser(user_id:int,user:schemas.UserUpdate ,db:Session=Depends(get_db)):
     print("user id",type(user_id))
     print("request data",user)
     user_query = db.query(models.User).filter(models.User.id == user_id)
+    for us in user_query:
+        print("value is",us.items[0].title)
     print("dataquery is ",type(user_query))
     user_data = user_query.first()
-
+    # print("Users",user_data.i)
     print("USER DATA",type(user_data))
     if not user_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'No note with this id: {user_id} found')
     update_data = user.dict(exclude_unset=True)
     print("update data is ",update_data)
-    # user_query.update(update_data, synchronize_session=False)
-    # print("Query is execue")
-    # db.commit()
-    # db.refresh(user_data)
-    return {"status": "success"}
+    user_query.update({"email":update_data['email']}, synchronize_session=False)
+    print("Query is execue")
+    db.commit()
+    db.refresh(user_data)
+    return Response(status_code=status.HTTP_200_OK)
 
     
 
