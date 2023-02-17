@@ -1,7 +1,10 @@
 from typing import List
-
+from fastapi import FastAPI,Request
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from fastapi import Depends, FastAPI, HTTPException,status,Response
 from sqlalchemy.orm import Session
+from fastapi.responses import HTMLResponse
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -9,9 +12,11 @@ from .database import SessionLocal, engine
 # create Database Table
 models.Base.metadata.create_all(bind=engine)
 
-
 app = FastAPI()
 
+app.mount("/static",StaticFiles(directory='static'),name='static')
+
+templates = Jinja2Templates(directory='templates')
 
 #Create Dependency
 def get_db():
@@ -92,8 +97,11 @@ def updateUser(user_id:int,user:schemas.UserUpdate ,db:Session=Depends(get_db)):
     db.refresh(user_data)
     return Response(status_code=status.HTTP_200_OK)
 
-    
-
 @app.get("/")
 def root():
     return {"message":"Welcome to fastAPI and SQLAlchemy"}
+
+@app.get("/login/",response_class=HTMLResponse)
+async def read_data(request:Request):
+    return templates.TemplateResponse("index.html",{"request":request})
+
